@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+  <RadioGroup android:layout_width="fill_parent"
+              android:layout_height="wrap_content" android:orientation="horizontal"
+              android:id="@+id/provider">
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/provider_label"/> 
+    <RadioButton android:checked="true"
+                 android:text="@string/gps_provider"
+                 android:id="@+id/gpsProvider" />
+    <RadioButton android:checked="false"
+                 android:text="@string/network_provider"
+                 android:id="@+id/networkProvider" />
+  </RadioGroup> 
+
+  <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/provider_status_label"/>
+
+    <TextView android:id="@+id/providerStatus"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+  <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/bluetooth_status_label"/>
+
+    <TextView android:id="@+id/bluetoothStatus"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+  <!--
+  <Button android:id="@+id/listenButton"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:text="@string/listen"/>
+
+  <Button android:id="@+id/acceptButton"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:text="@string/accept"/>
+  -->
+
+  <Button android:id="@+id/connectButton"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:text="@string/connect"/>
+</LinearLayout>

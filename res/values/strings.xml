@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">BlueNMEA</string>
+  <string name="provider_label">Provider:</string>
+  <string name="gps_provider">GPS</string>
+  <string name="network_provider">Network</string>
+  <string name="provider_status_label">Provider status:</string>
+  <string name="bluetooth_status_label">Bluetooth status:</string>
+  <string name="listen">Listen</string>
+  <string name="accept">Accept</string>
+  <string name="connect">Connect</string>
+  <string name="select_a_device">Select a device to connect to:</string>
+  <string name="no_devices">No Bluetooth devices were found.</string>
+</resources>

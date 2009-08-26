@@ -1,0 +1,53 @@
+BlueNMEA for Android
+====================
+
+ http://max.kellermann.name/projects/blue-nmea/
+
+BlueNMEA is an Android application which sends location data over
+Bluetooth (RFCOMM) in the NMEA format.
+
+I wrote this program to feed my PDA running XCSoar
+(http://www.xcsoar.org/).
+
+
+Compiling the sources
+---------------------
+
+You need:
+
+- Android SDK 1.5
+- Android NDK 1.5
+- Apache Ant and a Java SDK
+- GNU make
+
+Add the Android SDK to your PATH.  Run:
+
+ make NDK_ROOT=/path/to/android-ndk
+
+This builds bin/.BlueNMEA-debug.apk
+
+
+Using BlueNMEA
+--------------
+
+Right now, BlueNMEA can not listen for incoming RFCOMM connections.
+It attempts to initiate the connection.
+
+Make the remote device listen for RFCOMM.  On Windows Mobile, create
+an incoming COM port, and make the Bluetooth adapter visible.
+
+In BlueNMEA, select the GPS source, and click on "connect".  It
+attempts to discover nearby Bluetooth devices (no pairing required
+currently).  Click on the desired remote device.
+
+Once connected and location information is available, BlueNMEA starts
+sending NMEA records.
+
+
+Authors
+-------
+
+Max Kellermann <max@duempel.org>
+
+The icon was created by David Vignoni for the Nuvola icon theme, and
+is licensed under LGPL 2.1.
