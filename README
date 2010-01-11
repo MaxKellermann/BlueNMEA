@@ -22,7 +22,7 @@ You need:
 
 Add the Android SDK to your PATH.  Run:
 
- make NDK_ROOT=/path/to/android-ndk
+ make SDK_ROOT=/path/to/android-sdk NDK_ROOT=/path/to/android-ndk
 
 This builds bin/.BlueNMEA-debug.apk
 

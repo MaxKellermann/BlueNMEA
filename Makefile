@@ -11,6 +11,7 @@ CLASS_HEADER = $(subst .,_,$(CLASS_NAME)).h
 JAVA_SOURCES = $(wildcard src/$(subst .,/,$(JAVA_PACKAGE))/*.java)
 JAVA_CLASSES = $(patsubst src/%.java,bin/classes/%.class,$(JAVA_SOURCES))
 
+SDK_ROOT = $(HOME)/opt/android-sdk-linux_x86-1.5_r3
 NDK_ROOT = $(HOME)/opt/android-ndk-1.5_r1
 
 .PHONY: all clean realclean update install reinstall uninstall release
@@ -24,7 +25,7 @@ realclean: clean
 	rm -f build.xml default.properties local.properties
 
 build.xml:
-	android update project --path `pwd` --target 2
+	$(SDK_ROOT)/tools/android update project --path `pwd` --target 2
 
 update:| realclean build.xml
 
@@ -47,13 +48,13 @@ bin/.$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml
 	ant -quiet debug
 
 install: bin/.$(PROJECT_NAME)-debug.apk
-	adb install $<
+	$(SDK_ROOT)/tools/adb install $<
 
 reinstall: bin/.$(PROJECT_NAME)-debug.apk
-	adb install -r $<
+	$(SDK_ROOT)/tools/adb install -r $<
 
 uninstall:
-	adb uninstall $(JAVA_PACKAGE)
+	$(SDK_ROOT)/tools/adb uninstall $(JAVA_PACKAGE)
 
 release: libs/armeabi/lib$(JNI_NAME).so build.xml
 	ant -quiet release
