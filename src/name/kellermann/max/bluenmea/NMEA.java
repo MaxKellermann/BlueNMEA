@@ -83,8 +83,9 @@ final class NMEA {
         double latitude = location.getLatitude();
 
         return String.format("%02d%02d.%04d,N",
-                             (int)latitude, (int)(latitude * 60) % 60,
-                             ((int)latitude * 60 * 10000) % 10000);
+                             (int)latitude,
+                             Math.abs((int)(latitude * 60) % 60),
+                             Math.abs((int)(latitude * 60 * 10000) % 10000));
     }
 
     /**
@@ -94,8 +95,9 @@ final class NMEA {
         double longitude = location.getLongitude();
 
         return String.format("%03d%02d.%04d,E",
-                             (int)longitude, (int)(longitude * 60) % 60,
-                             ((int)longitude * 60 * 10000) % 10000);
+                             (int)longitude,
+                             Math.abs((int)(longitude * 60)) % 60,
+                             Math.abs((int)(longitude * 60 * 10000)) % 10000);
     }
 
     /**
