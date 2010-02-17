@@ -287,7 +287,9 @@ public class BlueNMEA extends Activity
             try {
                 sendSatellite(gps);
             } catch (IOException e) {
-                Log.e(TAG, "onGpsStatusChanged " + e.getMessage());
+                disconnect();
+
+                bluetoothStatus.setText("disconnected: " + e.getMessage());
             }
         }
     }
