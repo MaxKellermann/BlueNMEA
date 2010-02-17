@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.os.Handler;
 import android.content.Context;
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -61,6 +63,18 @@ public class BlueNMEA extends Activity
 
     /** the most recent known location, or null */
     Location location;
+
+    private void ExceptionAlert(Throwable exception, String title) {
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle(title);
+        dialog.setMessage(exception.getMessage());
+        dialog.setButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+        dialog.show();
+    }
 
     /** from Activity */
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -146,6 +160,7 @@ public class BlueNMEA extends Activity
             devices = scan();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            ExceptionAlert(e, "Scan failed");
             return;
         }
 
