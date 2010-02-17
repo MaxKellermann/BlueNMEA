@@ -133,8 +133,6 @@ public class BlueNMEA extends Activity
 
         if (locationProvider.equals(LocationManager.GPS_PROVIDER))
             locationManager.addGpsStatusListener(this);
-        else
-            locationManager.removeGpsStatusListener(this);
     }
 
     /**
@@ -207,6 +205,9 @@ public class BlueNMEA extends Activity
 
         if (connected) {
             locationManager.removeUpdates(this);
+
+            if (locationProvider.equals(LocationManager.GPS_PROVIDER))
+                locationManager.removeGpsStatusListener(this);
         }
 
         locationProvider = newLocationProvider;
@@ -219,8 +220,6 @@ public class BlueNMEA extends Activity
 
             if (locationProvider.equals(LocationManager.GPS_PROVIDER))
                 locationManager.addGpsStatusListener(this);
-            else
-                locationManager.removeGpsStatusListener(this);
         }
     }
 
