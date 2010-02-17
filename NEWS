@@ -1,4 +1,4 @@
-BlueNMEA 1.1 - not yet released
+BlueNMEA 1.1 - 2010-02-17
 * send $GPGSA/$GPGSV messages
 
 BlueNMEA 1.0.1 - 2010-01-11
