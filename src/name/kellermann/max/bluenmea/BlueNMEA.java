@@ -193,11 +193,14 @@ public class BlueNMEA extends Activity
         if (newLocationProvider.equals(locationProvider))
             return;
 
+        if (connected) {
+            locationManager.removeUpdates(this);
+        }
+
         locationProvider = newLocationProvider;
         clearLocation();
 
         if (connected) {
-            locationManager.removeUpdates(this);
             providerStatus.setText("waiting");
             locationManager.requestLocationUpdates(locationProvider,
                                                    1000, 0, this);
