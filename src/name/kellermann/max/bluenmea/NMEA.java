@@ -18,10 +18,17 @@
 
 package name.kellermann.max.bluenmea;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import android.os.Bundle;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.text.format.Time;
+import android.util.Log;
 
 /**
  * This class is a container for several static methods which help
@@ -162,5 +169,54 @@ final class NMEA {
         if (location.hasBearing())
             s += location.hasBearing();
         return s;
+    }
+
+    public static String formatGpsGsa(GpsStatus gps) {
+        String fix = "1";
+        String prn = "";
+        int nbr_sat = 0;
+        Iterator<GpsSatellite> satellites = gps.getSatellites().iterator();
+        for (int i = 0; i < 12; i++){
+            if (satellites.hasNext()){
+                GpsSatellite sat = satellites.next();
+                if (sat.usedInFix()){
+                    prn = prn + sat.getPrn();
+                    nbr_sat++;
+                }
+            }
+
+            prn = prn + ",";
+        }
+
+        if (nbr_sat > 3)
+            fix = "3";
+        else if(nbr_sat > 0)
+            fix = "2";
+
+        //TODO: calculate DOP values
+        return fix + "," + prn + ",,,";
+    }
+
+    public static List<String> formatGpsGsv(GpsStatus gps) {
+        List<String> gsv = new ArrayList<String>();
+        int nbr_sat = 0;
+        for (GpsSatellite sat : gps.getSatellites())
+            nbr_sat++;
+
+        Iterator<GpsSatellite> satellites = gps.getSatellites().iterator();
+        for (int i = 0; i < 3; i++) {
+            if (satellites.hasNext()) {
+                String g = Integer.toString(nbr_sat);
+                for (int n = 0; n < 4; n++) {
+                    if(satellites.hasNext()) {
+                        GpsSatellite sat = satellites.next();
+                        g = g + "," + sat.getPrn() + "," + sat.getElevation() +
+                            "," + sat.getAzimuth() + "," + sat.getSnr();
+                    }
+                }
+                gsv.add(g);
+            }
+        }
+        return gsv;
     }
 }

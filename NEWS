@@ -1,4 +1,5 @@
 BlueNMEA 1.1 - not yet released
+* send $GPGSA/$GPGSV messages
 
 BlueNMEA 1.0.1 - 2010-01-11
 * fix for malformed negative latitude/longitude values

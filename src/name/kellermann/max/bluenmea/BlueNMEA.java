@@ -19,6 +19,7 @@
 package name.kellermann.max.bluenmea;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.io.IOException;
 
 import android.app.Activity;
@@ -32,14 +33,16 @@ import android.os.Handler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.location.GpsStatus.Listener;
 import android.util.Log;
 
 public class BlueNMEA extends Activity
-    implements RadioGroup.OnCheckedChangeListener, LocationListener, Runnable {
+    implements RadioGroup.OnCheckedChangeListener, LocationListener, Runnable, Listener {
     private static final String TAG = "BlueNMEA";
 
     static {
@@ -127,6 +130,11 @@ public class BlueNMEA extends Activity
         providerStatus.setText("waiting");
         locationManager.requestLocationUpdates(locationProvider,
                                                1000, 0, this);
+
+        if (locationProvider.equals(LocationManager.GPS_PROVIDER))
+            locationManager.addGpsStatusListener(this);
+        else
+            locationManager.removeGpsStatusListener(this);
     }
 
     /**
@@ -149,6 +157,10 @@ public class BlueNMEA extends Activity
         connected = false;
 
         locationManager.removeUpdates(this);
+
+        if (locationProvider.equals(LocationManager.GPS_PROVIDER))
+            locationManager.removeGpsStatusListener(this);
+
         providerStatus.setText("unknown");
         clearLocation();
     }
@@ -204,6 +216,11 @@ public class BlueNMEA extends Activity
             providerStatus.setText("waiting");
             locationManager.requestLocationUpdates(locationProvider,
                                                    1000, 0, this);
+
+            if (locationProvider.equals(LocationManager.GPS_PROVIDER))
+                locationManager.addGpsStatusListener(this);
+            else
+                locationManager.removeGpsStatusListener(this);
         }
     }
 
@@ -231,6 +248,16 @@ public class BlueNMEA extends Activity
                          date + ",,");
     }
 
+    private void sendSatellite(GpsStatus gps) throws IOException {
+        String gsa = NMEA.formatGpsGsa(gps);
+        sendWithChecksum("GPGSA,A," + gsa);
+
+        List<String> gsvs = NMEA.formatGpsGsv(gps);
+        for(String gsv : gsvs)
+            sendWithChecksum("GPGSV," + gsvs.size() + "," +
+                             Integer.toString(gsvs.indexOf(gsv)+1) + "," + gsv);
+    }
+
     /** from LocationManager */
     @Override public void onLocationChanged(Location newLocation) {
         Log.d(TAG, "onLocationChanged " + newLocation);
@@ -252,6 +279,17 @@ public class BlueNMEA extends Activity
             disconnect();
 
             bluetoothStatus.setText("disconnected: " + e.getMessage());
+        }
+    }
+
+    public void onGpsStatusChanged(int event) {
+        if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+            GpsStatus gps = locationManager.getGpsStatus(null);
+            try {
+                sendSatellite(gps);
+            } catch (IOException e) {
+                Log.e(TAG, "onGpsStatusChanged " + e.getMessage());
+            }
         }
     }
 
