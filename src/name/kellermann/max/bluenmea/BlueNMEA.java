@@ -38,20 +38,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.location.GpsStatus.Listener;
 import android.util.Log;
 
 public class BlueNMEA extends Activity
-    implements RadioGroup.OnCheckedChangeListener, LocationListener, Runnable, Listener {
+    implements RadioGroup.OnCheckedChangeListener, LocationListener,
+               Source.Listener {
     private static final String TAG = "BlueNMEA";
 
     static {
         System.loadLibrary("bluebridge");
     }
-
-    /** this timer is used for sending regular updates over the
-        socket, even when onLocationChanged() is not called */
-    private Handler timer = new Handler();
 
     /** is the Bluetooth socket connected */
     boolean connected = false;
@@ -61,11 +57,10 @@ public class BlueNMEA extends Activity
 
     LocationManager locationManager;
 
+    Source source;
+
     RadioGroup locationProviderGroup;
     TextView providerStatus, bluetoothStatus;
-
-    /** the most recent known location, or null */
-    Location location;
 
     private void ExceptionAlert(Throwable exception, String title) {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
@@ -104,6 +99,7 @@ public class BlueNMEA extends Activity
 
         locationProvider = LocationManager.GPS_PROVIDER;
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        source = new Source(locationManager);
     }
 
     /** from Activity */
@@ -130,19 +126,7 @@ public class BlueNMEA extends Activity
         providerStatus.setText("waiting");
         locationManager.requestLocationUpdates(locationProvider,
                                                1000, 0, this);
-
-        if (locationProvider.equals(LocationManager.GPS_PROVIDER))
-            locationManager.addGpsStatusListener(this);
-    }
-
-    /**
-     * Clears the saved location and disables the timer.
-     */
-    private void clearLocation() {
-        if (location != null) {
-            timer.removeCallbacks(this);
-            location = null;
-        }
+        source.addListener(this);
     }
 
     /**
@@ -156,11 +140,9 @@ public class BlueNMEA extends Activity
 
         locationManager.removeUpdates(this);
 
-        if (locationProvider.equals(LocationManager.GPS_PROVIDER))
-            locationManager.removeGpsStatusListener(this);
-
         providerStatus.setText("unknown");
-        clearLocation();
+
+        source.removeListener(this);
     }
 
     private void onConnectButtonClicked() {
@@ -203,77 +185,23 @@ public class BlueNMEA extends Activity
         if (newLocationProvider.equals(locationProvider))
             return;
 
-        if (connected) {
+        if (connected)
             locationManager.removeUpdates(this);
 
-            if (locationProvider.equals(LocationManager.GPS_PROVIDER))
-                locationManager.removeGpsStatusListener(this);
-        }
-
         locationProvider = newLocationProvider;
-        clearLocation();
+        source.setLocationProvider(newLocationProvider);
 
         if (connected) {
             providerStatus.setText("waiting");
             locationManager.requestLocationUpdates(locationProvider,
                                                    1000, 0, this);
-
-            if (locationProvider.equals(LocationManager.GPS_PROVIDER))
-                locationManager.addGpsStatusListener(this);
         }
     }
 
-    private void sendWithChecksum(String line) throws IOException {
-        line = NMEA.decorate(line);
-        send(line + "\n");
-        Log.d(TAG, "SEND '" + line + "'");
-    }
-
-    private void sendLocation() throws IOException {
-        String time = NMEA.formatTime(location);
-        String date = NMEA.formatDate(location);
-        String position = NMEA.formatPosition(location);
-
-        sendWithChecksum("GPGGA," + time + "," +
-                         position + ",1," +
-                         NMEA.formatSatellites(location) + "," +
-                         location.getAccuracy() + "," +
-                         NMEA.formatAltitude(location) + ",,,,");
-        sendWithChecksum("GPGLL," + position + "," + time + ",A");
-        sendWithChecksum("GPRMC," + time + ",A," +
-                         position + "," +
-                         NMEA.formatSpeedKt(location) + "," +
-                         NMEA.formatBearing(location) + "," +
-                         date + ",,");
-    }
-
-    private void sendSatellite(GpsStatus gps) throws IOException {
-        String gsa = NMEA.formatGpsGsa(gps);
-        sendWithChecksum("GPGSA,A," + gsa);
-
-        List<String> gsvs = NMEA.formatGpsGsv(gps);
-        for(String gsv : gsvs)
-            sendWithChecksum("GPGSV," + gsvs.size() + "," +
-                             Integer.toString(gsvs.indexOf(gsv)+1) + "," + gsv);
-    }
-
-    /** from LocationManager */
-    @Override public void onLocationChanged(Location newLocation) {
-        Log.d(TAG, "onLocationChanged " + newLocation);
-
-        providerStatus.setText("ok");
-
-        if (location != null)
-            /* reset the timer */
-            timer.removeCallbacks(this);
-
-        location = newLocation;
-
+    /** from Source.Listener */
+    @Override public void onLine(String line) {
         try {
-            sendLocation();
-
-            /* requeue the timer with a fresh duration */
-            timer.postDelayed(this, 5000);
+            send(line + "\n");
         } catch (IOException e) {
             disconnect();
 
@@ -281,24 +209,16 @@ public class BlueNMEA extends Activity
         }
     }
 
-    public void onGpsStatusChanged(int event) {
-        if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-            GpsStatus gps = locationManager.getGpsStatus(null);
-            try {
-                sendSatellite(gps);
-            } catch (IOException e) {
-                disconnect();
+    /** from LocationManager */
+    @Override public void onLocationChanged(Location newLocation) {
+        Log.d(TAG, "onLocationChanged " + newLocation);
 
-                bluetoothStatus.setText("disconnected: " + e.getMessage());
-            }
-        }
+        providerStatus.setText("ok");
     }
 
     /** from LocationManager */
     @Override public void onProviderDisabled(String provider) {
         providerStatus.setText("disabled");
-
-        clearLocation();
     }
 
     /** from LocationManager */
@@ -313,26 +233,11 @@ public class BlueNMEA extends Activity
         case LocationProvider.OUT_OF_SERVICE:
         case LocationProvider.TEMPORARILY_UNAVAILABLE:
             providerStatus.setText("unavailable");
-            clearLocation();
             break;
 
         case LocationProvider.AVAILABLE:
             providerStatus.setText("ok");
             break;
-        }
-    }
-
-    /** from Runnable */
-    @Override public void run() {
-        try {
-            sendLocation();
-
-            /* requeue the timer with a fresh duration */
-            timer.postDelayed(this, 5000);
-        } catch (IOException e) {
-            disconnect();
-
-            bluetoothStatus.setText("disconnected: " + e.getMessage());
         }
     }
 
