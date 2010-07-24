@@ -64,9 +64,11 @@ throw_ioexception(JNIEnv *env, const char *msg)
  * Throws strerror(errno) in an IOException.
  */
 static void
-throw_errno(JNIEnv *env)
+throw_errno(JNIEnv *env, const char *msg)
 {
-	throw_ioexception(env, strerror(errno));
+	char buffer[256];
+	snprintf(buffer, sizeof(buffer), "%s: %s", msg, strerror(errno));
+	throw_ioexception(env, msg);
 }
 
 /**
@@ -120,7 +122,7 @@ Java_name_kellermann_max_bluenmea_Bridge_scan(JNIEnv *env, jobject obj)
 
 	dev_id = hci_get_route(NULL);
 	if (dev_id < 0) {
-		throw_ioexception(env, "hci_get_route() has failed");
+		throw_errno(env, "hci_get_route() has failed");
 		return NULL;
 	}
 
@@ -128,7 +130,7 @@ Java_name_kellermann_max_bluenmea_Bridge_scan(JNIEnv *env, jobject obj)
 	   interrupts us for longer delays) */
 	num_rsp = hci_inquiry(dev_id, 3, 256, NULL, &ii, IREQ_CACHE_FLUSH);
 	if (num_rsp < 0) {
-		throw_ioexception(env, "hci_inquiry() has failed");
+		throw_errno(env, "hci_inquiry() has failed");
 		return NULL;
 	}
 
@@ -168,13 +170,14 @@ Java_name_kellermann_max_bluenmea_Bridge_open(JNIEnv *env, jobject obj,
 
 	sockfd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	if (sockfd < 0) {
-		throw_errno(env);
+		throw_errno(env, "Failed to create Bluetooth RFCOMM socket");
 		return;
 	}
 
 	int ret = connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 	if (ret < 0) {
-		throw_errno(env);
+		throw_errno(env,
+			    "Failed to connect to remote Bluetooth device");
 
 		close(sockfd);
 		sockfd = -1;
@@ -193,7 +196,7 @@ Java_name_kellermann_max_bluenmea_Bridge_listen(JNIEnv *env, jobject obj)
 
 	listen_fd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 	if (listen_fd < 0) {
-		throw_errno(env);
+		throw_errno(env, "Failed to create Bluetooth RFCOMM socket");
 		return;
 	}
 
@@ -205,7 +208,7 @@ Java_name_kellermann_max_bluenmea_Bridge_listen(JNIEnv *env, jobject obj)
 	int ret = bind(listen_fd, (struct sockaddr *)&loc_addr,
 		       sizeof(loc_addr));
 	if (ret < 0) {
-		throw_errno(env);
+		throw_errno(env, "Failed to bind to local Bluetooth address");
 
 		close(listen_fd);
 		listen_fd = -1;
@@ -214,7 +217,8 @@ Java_name_kellermann_max_bluenmea_Bridge_listen(JNIEnv *env, jobject obj)
 
 	ret = listen(listen_fd, 1);
 	if (ret < 0) {
-		throw_errno(env);
+		throw_errno(env,
+			    "Failed to listen on local Bluetooth address");
 		return;
 	}
 }
@@ -241,7 +245,8 @@ Java_name_kellermann_max_bluenmea_Bridge_accept(JNIEnv *env, jobject obj)
 	sockfd = accept(listen_fd, (struct sockaddr *)&remote_address,
 			&remote_address_length);
 	if (sockfd < 0) {
-		throw_errno(env);
+		throw_errno(env,
+			    "Failed to accept incoming Bluetooth connection");
 		return NULL;
 	}
 
@@ -278,5 +283,6 @@ Java_name_kellermann_max_bluenmea_Bridge_send(JNIEnv *env, jobject obj, jstring 
 	(*env)->ReleaseStringUTFChars(env, line, line_native);
 
 	if (nbytes < 0)
-		throw_errno(env);
+		throw_errno(env,
+			    "Failed to send data to remote Bluetooth device");
 }
