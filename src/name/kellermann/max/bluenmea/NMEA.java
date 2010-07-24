@@ -88,11 +88,14 @@ final class NMEA {
      */
     public static String formatLatitude(Location location) {
         double latitude = location.getLatitude();
+        char suffix = latitude < 0 ? 'S' : 'N';
+        latitude = Math.abs(latitude);
 
-        return String.format("%02d%02d.%04d,N",
+        return String.format("%02d%02d.%04d,%c",
                              (int)latitude,
-                             Math.abs((int)(latitude * 60) % 60),
-                             Math.abs((int)(latitude * 60 * 10000) % 10000));
+                             (int)(latitude * 60) % 60,
+                             (int)(latitude * 60 * 10000) % 10000,
+                             suffix);
     }
 
     /**
@@ -100,11 +103,14 @@ final class NMEA {
      */
     public static String formatLongitude(Location location) {
         double longitude = location.getLongitude();
+        char suffix = longitude < 0 ? 'W' : 'E';
+        longitude = Math.abs(longitude);
 
-        return String.format("%03d%02d.%04d,E",
+        return String.format("%03d%02d.%04d,%c",
                              (int)longitude,
-                             Math.abs((int)(longitude * 60)) % 60,
-                             Math.abs((int)(longitude * 60 * 10000)) % 10000);
+                             (int)(longitude * 60) % 60,
+                             (int)(longitude * 60 * 10000) % 10000,
+                             suffix);
     }
 
     /**

@@ -1,4 +1,5 @@
 BlueNMEA 1.2 - not yet released
+* fix N/S, E/W suffixes
 
 BlueNMEA 1.1 - 2010-02-17
 * send $GPGSA/$GPGSV messages
