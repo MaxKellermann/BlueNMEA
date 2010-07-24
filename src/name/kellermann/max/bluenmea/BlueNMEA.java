@@ -45,9 +45,7 @@ public class BlueNMEA extends Activity
                Source.Listener {
     private static final String TAG = "BlueNMEA";
 
-    static {
-        System.loadLibrary("bluebridge");
-    }
+    Bridge bridge;
 
     /** is the Bluetooth socket connected */
     boolean connected = false;
@@ -77,6 +75,8 @@ public class BlueNMEA extends Activity
     /** from Activity */
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        bridge = new Bridge();
 
         setContentView(R.layout.main);
 
@@ -115,7 +115,7 @@ public class BlueNMEA extends Activity
         disconnect();
 
         try {
-            open(address);
+            bridge.open(address);
             bluetoothStatus.setText("connected with " + address);
         } catch (IOException e) {
             bluetoothStatus.setText("failed: " + e.getMessage());
@@ -134,7 +134,7 @@ public class BlueNMEA extends Activity
      * and clears the saved location.
      */
     private void disconnect() {
-        close();
+        bridge.close();
         bluetoothStatus.setText("not connected");
         connected = false;
 
@@ -149,7 +149,7 @@ public class BlueNMEA extends Activity
         String[] devices;
 
         try {
-            devices = scan();
+            devices = bridge.scan();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
             ExceptionAlert(e, "Scan failed");
@@ -201,7 +201,7 @@ public class BlueNMEA extends Activity
     /** from Source.Listener */
     @Override public void onLine(String line) {
         try {
-            send(line + "\n");
+            bridge.send(line + "\n");
         } catch (IOException e) {
             disconnect();
 
@@ -240,11 +240,4 @@ public class BlueNMEA extends Activity
             break;
         }
     }
-
-    public native String[] scan() throws IOException;
-    public native void open(String address) throws IOException;
-    public native void listen() throws IOException;
-    public native String accept() throws IOException;
-    public native void close();
-    public native void send(String line) throws IOException;
 }

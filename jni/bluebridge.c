@@ -22,7 +22,7 @@
  *
  */
 
-#include "name_kellermann_max_bluenmea_BlueNMEA.h"
+#include "name_kellermann_max_bluenmea_Bridge.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -110,7 +110,7 @@ jstring_to_sockaddr_rc(struct sockaddr_rc *dest, JNIEnv *env, jstring src)
 }
 
 JNIEXPORT jobjectArray JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_scan(JNIEnv *env, jobject obj)
+Java_name_kellermann_max_bluenmea_Bridge_scan(JNIEnv *env, jobject obj)
 {
 	inquiry_info *ii = NULL;
 	int dev_id, num_rsp;
@@ -150,7 +150,7 @@ Java_name_kellermann_max_bluenmea_BlueNMEA_scan(JNIEnv *env, jobject obj)
 static int listen_fd = -1, sockfd = -1;
 
 JNIEXPORT void JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_open(JNIEnv *env, jobject obj,
+Java_name_kellermann_max_bluenmea_Bridge_open(JNIEnv *env, jobject obj,
 						jstring address_string)
 {
 	struct sockaddr_rc addr;
@@ -183,7 +183,7 @@ Java_name_kellermann_max_bluenmea_BlueNMEA_open(JNIEnv *env, jobject obj,
 }
 
 JNIEXPORT void JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_listen(JNIEnv *env, jobject obj)
+Java_name_kellermann_max_bluenmea_Bridge_listen(JNIEnv *env, jobject obj)
 {
 	(void)env;
 	(void)obj;
@@ -220,7 +220,7 @@ Java_name_kellermann_max_bluenmea_BlueNMEA_listen(JNIEnv *env, jobject obj)
 }
 
 JNIEXPORT jstring JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_accept(JNIEnv *env, jobject obj)
+Java_name_kellermann_max_bluenmea_Bridge_accept(JNIEnv *env, jobject obj)
 {
 	struct sockaddr_rc remote_address;
 	socklen_t remote_address_length;
@@ -249,7 +249,7 @@ Java_name_kellermann_max_bluenmea_BlueNMEA_accept(JNIEnv *env, jobject obj)
 }
 
 JNIEXPORT void JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_close(JNIEnv *env, jobject obj)
+Java_name_kellermann_max_bluenmea_Bridge_close(JNIEnv *env, jobject obj)
 {
 	(void)env;
 	(void)obj;
@@ -261,7 +261,7 @@ Java_name_kellermann_max_bluenmea_BlueNMEA_close(JNIEnv *env, jobject obj)
 }
 
 JNIEXPORT void JNICALL
-Java_name_kellermann_max_bluenmea_BlueNMEA_send(JNIEnv *env, jobject obj, jstring line)
+Java_name_kellermann_max_bluenmea_Bridge_send(JNIEnv *env, jobject obj, jstring line)
 {
 	ssize_t nbytes;
 

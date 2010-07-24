@@ -3,7 +3,7 @@ PROJECT_NAME = BlueNMEA
 JAVA_PACKAGE = name.kellermann.max.bluenmea
 JNI_NAME = bluebridge
 
-CLASS_NAME = $(JAVA_PACKAGE).$(PROJECT_NAME)
+CLASS_NAME = $(JAVA_PACKAGE).Bridge
 CLASS_SOURCE = $(subst .,/,$(CLASS_NAME)).java
 CLASS_CLASS = $(patsubst %.java,%.class,$(CLASS_SOURCE))
 CLASS_HEADER = $(subst .,_,$(CLASS_NAME)).h
