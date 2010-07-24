@@ -12,4 +12,5 @@
   <string name="select_a_device">Select a device to connect to:</string>
   <string name="no_devices">No Bluetooth devices were found.</string>
   <string name="bridge_failed">Failed to load the Bluetooth library.</string>
+  <string name="no_bluetooth">Please enable Bluetooth.</string>
 </resources>

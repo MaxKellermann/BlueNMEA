@@ -154,6 +154,13 @@ public class BlueNMEA extends Activity
 
         try {
             devices = bridge.scan();
+        } catch (NoBluetoothException e) {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.no_bluetooth)
+                .setPositiveButton("OK", null)
+                .show();
+            return;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
             ExceptionAlert(e, "Scan failed");

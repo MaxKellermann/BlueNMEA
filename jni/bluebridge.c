@@ -122,7 +122,11 @@ Java_name_kellermann_max_bluenmea_Bridge_scan(JNIEnv *env, jobject obj)
 
 	dev_id = hci_get_route(NULL);
 	if (dev_id < 0) {
-		throw_errno(env, "hci_get_route() has failed");
+		if (errno == ENODEV)
+			throw(env, "name/kellermann/max/bluenmea/NoBluetoothException",
+			      "No bluetooth");
+		else
+			throw_ioexception(env, "hci_get_route() has failed");
 		return NULL;
 	}
 
