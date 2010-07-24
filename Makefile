@@ -1,4 +1,4 @@
-VERSION = 1.1
+VERSION = 1.2
 PROJECT_NAME = BlueNMEA
 JAVA_PACKAGE = name.kellermann.max.bluenmea
 JNI_NAME = bluebridge

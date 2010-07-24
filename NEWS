@@ -1,4 +1,4 @@
-BlueNMEA 1.2 - not yet released
+BlueNMEA 1.2 - 2010-07-24
 * fix N/S, E/W suffixes
 * show error message when Bluetooth library isn't available
 * better system error messages
