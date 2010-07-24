@@ -77,6 +77,10 @@ public class BlueNMEA extends Activity
         super.onCreate(savedInstanceState);
 
         bridge = new Bridge();
+        if (!bridge.loaded) {
+            setContentView(R.layout.bridge_failed);
+            return;
+        }
 
         setContentView(R.layout.main);
 

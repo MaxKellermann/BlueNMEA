@@ -21,8 +21,14 @@ package name.kellermann.max.bluenmea;
 import java.io.IOException;
 
 public class Bridge {
+    public static boolean loaded = false;
+
     static {
-        System.loadLibrary("bluebridge");
+        try {
+            System.loadLibrary("bluebridge");
+            loaded = true;
+        } catch (UnsatisfiedLinkError e) {
+        }
     }
 
     public native String[] scan() throws IOException;
