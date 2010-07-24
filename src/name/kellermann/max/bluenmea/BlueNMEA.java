@@ -217,6 +217,10 @@ public class BlueNMEA extends Activity
             disconnect();
 
             bluetoothStatus.setText("disconnected: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            /* this happens when the socket has been closed by the
+               main thread, while the timer thread runs; let's ignore
+               it, it won't happen again */
         }
     }
 
