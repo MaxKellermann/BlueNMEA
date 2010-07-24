@@ -3,6 +3,7 @@ BlueNMEA 1.2 - not yet released
 * show error message when Bluetooth library isn't available
 * better system error messages
   - print a helpful message when Bluetooth is disabled
+* fix NullPointerException due to race condition
 
 BlueNMEA 1.1 - 2010-02-17
 * send $GPGSA/$GPGSV messages

@@ -133,7 +133,7 @@ public class Source
         Log.d(TAG, "SEND '" + line + "'");
     }
 
-    private void sendLocation() {
+    private void sendLocation(Location location) {
         String time = NMEA.formatTime(location);
         String date = NMEA.formatDate(location);
         String position = NMEA.formatPosition(location);
@@ -174,7 +174,7 @@ public class Source
         /* requeue the timer with a fresh duration */
         timer.postDelayed(this, 5000);
 
-        sendLocation();
+        sendLocation(location);
     }
 
     /** from GpsStatus.Listener */
@@ -211,6 +211,6 @@ public class Source
         /* requeue the timer with a fresh duration */
         timer.postDelayed(this, 5000);
 
-        sendLocation();
+        sendLocation(location);
     }
 }
