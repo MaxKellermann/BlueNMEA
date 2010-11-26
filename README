@@ -42,8 +42,8 @@ in the according branch.  Run "ndk-build", then copy the headers
 ./obj/local/armeabi/libbluetooth.a to $LIBBLUETOOTH_BASE/libs/armeabi.
 
 
-Using BlueNMEA
---------------
+Using BlueNMEA over Bluetooth
+-----------------------------
 
 Right now, BlueNMEA can not listen for incoming RFCOMM connections.
 It attempts to initiate the connection.
@@ -57,6 +57,16 @@ currently).  Click on the desired remote device.
 
 Once connected and location information is available, BlueNMEA starts
 sending NMEA records.
+
+
+Using BlueNMEA over USB
+-----------------------
+
+Needs the Android SDK.
+
+Connect your phone to a computer with the USB data cable.  On the
+computer, type "adb forward tcp:4352 tcp:4352".  Now you can get NMEA
+data by connecting to TCP 4352 on your computer.
 
 
 Authors

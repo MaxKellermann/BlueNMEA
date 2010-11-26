@@ -80,7 +80,8 @@ class ScanThread extends Thread {
 
 public class BlueNMEA extends Activity
     implements RadioGroup.OnCheckedChangeListener,
-               Source.StatusListener, Client.Listener {
+               Source.StatusListener, Client.Listener,
+               TCPServer.Listener {
     private static final String TAG = "BlueNMEA";
 
     static final int SCANNING_DIALOG = 0;
@@ -90,6 +91,8 @@ public class BlueNMEA extends Activity
     /** the Bluetooth peer; null if none is connected */
     Client bluetoothClient;
 
+    TCPServer tcp;
+
     /** the name of the currently selected location provider */
     String locationProvider;
 
@@ -98,7 +101,7 @@ public class BlueNMEA extends Activity
     Source source;
 
     RadioGroup locationProviderGroup;
-    TextView providerStatus, bluetoothStatus;
+    TextView providerStatus, bluetoothStatus, tcpStatus;
 
     ArrayList<Client> clients = new ArrayList<Client>();
     ArrayAdapter clientListAdapter;
@@ -143,6 +146,7 @@ public class BlueNMEA extends Activity
         providerStatus.setText(R.string.status_unknown);
         bluetoothStatus = (TextView)findViewById(R.id.bluetoothStatus);
         bluetoothStatus.setText("not connected");
+        tcpStatus = (TextView)findViewById(R.id.tcpStatus);
 
         locationProviderGroup = (RadioGroup)findViewById(R.id.provider);
         locationProviderGroup.setOnCheckedChangeListener(this);
@@ -164,6 +168,14 @@ public class BlueNMEA extends Activity
             new ArrayAdapter(this, android.R.layout.simple_list_item_1);
         ListView clientList = (ListView)findViewById(R.id.clients);
         clientList.setAdapter(clientListAdapter);
+
+        try {
+            int port = 4352;
+            tcp = new TCPServer(this, port);
+            tcpStatus.setText("listening on port " + port);
+        } catch (IOException e) {
+            tcpStatus.setText("failed: " + e.getMessage());
+        }
     }
 
     /** from Activity */
@@ -239,11 +251,16 @@ public class BlueNMEA extends Activity
 
     class ClientHandler extends Handler {
         public static final int REMOVE = 1;
+        public static final int ADD = 2;
 
         public void handleMessage(Message msg) {
             Client client = (Client)msg.obj;
 
             switch (msg.what) {
+            case ADD:
+                addClient(client);
+                break;
+
             case REMOVE:
                 removeClient(client);
 
@@ -312,5 +329,12 @@ public class BlueNMEA extends Activity
         clientHandler.sendMessage(msg);
 
         client.close();
+    }
+
+    /** from TCPServer.Listener */
+    @Override public void onNewClient(Client client) {
+        Message msg = clientHandler.obtainMessage(ClientHandler.ADD,
+                                                  client);
+        clientHandler.sendMessage(msg);
     }
 }
