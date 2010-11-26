@@ -41,10 +41,13 @@ import android.util.Log;
 
 public class BlueNMEA extends Activity
     implements RadioGroup.OnCheckedChangeListener,
-               Source.NMEAListener, Source.StatusListener {
+               Source.StatusListener, Client.Listener {
     private static final String TAG = "BlueNMEA";
 
     Bridge bridge;
+
+    /** the Bluetooth peer; null if none is connected */
+    Client bluetoothClient;
 
     /** the name of the currently selected location provider */
     String locationProvider;
@@ -112,7 +115,11 @@ public class BlueNMEA extends Activity
         if (address == null)
             return;
 
-        disconnect();
+        if (bluetoothClient != null) {
+            source.removeListener(bluetoothClient);
+            bluetoothClient.close();
+            bluetoothClient = null;
+        }
 
         try {
             bridge.open(address);
@@ -122,18 +129,8 @@ public class BlueNMEA extends Activity
             return;
         }
 
-        source.addListener(this);
-    }
-
-    /**
-     * Disconnect the Bluetooth socket, disables the LocationManager
-     * and clears the saved location.
-     */
-    private void disconnect() {
-        bridge.close();
-        bluetoothStatus.setText("not connected");
-
-        source.removeListener(this);
+        bluetoothClient = new Peer(this, bridge);
+        source.addListener(bluetoothClient);
     }
 
     private void onConnectButtonClicked() {
@@ -187,23 +184,19 @@ public class BlueNMEA extends Activity
         source.setLocationProvider(newLocationProvider);
     }
 
-    /** from Source.NMEAListener */
-    @Override public void onLine(String line) {
-        try {
-            bridge.send(line + "\n");
-        } catch (IOException e) {
-            disconnect();
-
-            bluetoothStatus.setText("disconnected: " + e.getMessage());
-        } catch (IllegalStateException e) {
-            /* this happens when the socket has been closed by the
-               main thread, while the timer thread runs; let's ignore
-               it, it won't happen again */
-        }
-    }
-
     /** from Source.StatusListener */
     @Override public void onStatusChanged(int status) {
         providerStatus.setText(status);
+    }
+
+    /** from Client.Listener */
+    @Override public void onClientFailure(Client client, Throwable t) {
+        if (client == bluetoothClient) {
+            bluetoothClient = null;
+            bluetoothStatus.setText("disconnected: " + t.getMessage());
+        }
+
+        source.removeListener(client);
+        client.close();
     }
 }
