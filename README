@@ -16,15 +16,30 @@ Compiling the sources
 You need:
 
 - Android SDK 1.5
-- Android NDK 1.5
+- Android NDK r4b
 - Apache Ant and a Java SDK
 - GNU make
+- libbluetooth compiled for Android
 
 Add the Android SDK to your PATH.  Run:
 
- make SDK_ROOT=/path/to/android-sdk NDK_ROOT=/path/to/android-ndk
+ make SDK_ROOT=/path/to/android-sdk NDK_ROOT=/path/to/android-ndk LIBBLUETOOTH_BASE=/path/to/libbluetooth
 
 This builds bin/.BlueNMEA-debug.apk
+
+
+Compiling libbluetooth
+----------------------
+
+libbluetooth was part of the 1.5 NDK, but was removed in later
+versions.  This means that we need to compile our own version of that
+library - which is tricky, because Android uses a non-standard build
+system.
+
+The BlueNMEA git repository contains a build script for libbluetooth
+in the according branch.  Run "ndk-build", then copy the headers
+(./lib/*.h) to $LIBBLUETOOTH_BASE/include/bluetooth and
+./obj/local/armeabi/libbluetooth.a to $LIBBLUETOOTH_BASE/libs/armeabi.
 
 
 Using BlueNMEA

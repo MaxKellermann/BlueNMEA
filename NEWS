@@ -1,4 +1,5 @@
 BlueNMEA 2.0 - not yet released
+* Makefile: adapt to newest Android NDK r4b
 
 BlueNMEA 1.2 - 2010-07-24
 * fix N/S, E/W suffixes
