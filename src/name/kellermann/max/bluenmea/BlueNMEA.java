@@ -42,7 +42,7 @@ import android.util.Log;
 
 public class BlueNMEA extends Activity
     implements RadioGroup.OnCheckedChangeListener, LocationListener,
-               Source.Listener {
+               Source.NMEAListener {
     private static final String TAG = "BlueNMEA";
 
     Bridge bridge;
@@ -209,7 +209,7 @@ public class BlueNMEA extends Activity
         }
     }
 
-    /** from Source.Listener */
+    /** from Source.NMEAListener */
     @Override public void onLine(String line) {
         try {
             bridge.send(line + "\n");

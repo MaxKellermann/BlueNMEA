@@ -61,11 +61,11 @@ public class Source
     /** the most recent known location, or null */
     Location location;
 
-    public interface Listener {
+    public interface NMEAListener {
         void onLine(String line);
     }
 
-    List<Listener> listeners = new LinkedList<Listener>();
+    List<NMEAListener> nmeaListeners = new LinkedList<NMEAListener>();
 
     Source(LocationManager _locationManager) {
         locationManager = _locationManager;
@@ -99,31 +99,31 @@ public class Source
     }
 
     public void setLocationProvider(String _locationProvider) {
-        if (!listeners.isEmpty())
+        if (!nmeaListeners.isEmpty())
             disable();
 
         locationProvider = _locationProvider;
 
-        if (!listeners.isEmpty())
+        if (!nmeaListeners.isEmpty())
             enable();
     }
 
-    public void addListener(Listener l) {
-        if (listeners.isEmpty())
+    public void addListener(NMEAListener l) {
+        if (nmeaListeners.isEmpty())
             enable();
 
-        listeners.add(l);
+        nmeaListeners.add(l);
     }
 
-    public void removeListener(Listener l) {
-        listeners.remove(l);
+    public void removeListener(NMEAListener l) {
+        nmeaListeners.remove(l);
 
-        if (listeners.isEmpty())
+        if (nmeaListeners.isEmpty())
             disable();
     }
 
     protected void broadcastLine(String line) {
-        for (Listener l: listeners)
+        for (NMEAListener l: nmeaListeners)
             l.onLine(line);
     }
 
