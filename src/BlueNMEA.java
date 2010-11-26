@@ -35,20 +35,16 @@ import android.content.Intent;
 import android.content.DialogInterface;
 import android.location.GpsStatus;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.util.Log;
 
 public class BlueNMEA extends Activity
-    implements RadioGroup.OnCheckedChangeListener, LocationListener,
-               Source.NMEAListener {
+    implements RadioGroup.OnCheckedChangeListener,
+               Source.NMEAListener, Source.StatusListener {
     private static final String TAG = "BlueNMEA";
 
     Bridge bridge;
-
-    /** is the Bluetooth socket connected */
-    boolean connected = false;
 
     /** the name of the currently selected location provider */
     String locationProvider;
@@ -85,7 +81,7 @@ public class BlueNMEA extends Activity
         setContentView(R.layout.main);
 
         providerStatus = (TextView)findViewById(R.id.providerStatus);
-        providerStatus.setText("unknown");
+        providerStatus.setText(R.string.status_unknown);
         bluetoothStatus = (TextView)findViewById(R.id.bluetoothStatus);
         bluetoothStatus.setText("not connected");
 
@@ -103,7 +99,7 @@ public class BlueNMEA extends Activity
 
         locationProvider = LocationManager.GPS_PROVIDER;
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        source = new Source(locationManager);
+        source = new Source(locationManager, this);
     }
 
     /** from Activity */
@@ -126,10 +122,6 @@ public class BlueNMEA extends Activity
             return;
         }
 
-        connected = true;
-        providerStatus.setText("waiting");
-        locationManager.requestLocationUpdates(locationProvider,
-                                               1000, 0, this);
         source.addListener(this);
     }
 
@@ -140,11 +132,6 @@ public class BlueNMEA extends Activity
     private void disconnect() {
         bridge.close();
         bluetoothStatus.setText("not connected");
-        connected = false;
-
-        locationManager.removeUpdates(this);
-
-        providerStatus.setText("unknown");
 
         source.removeListener(this);
     }
@@ -196,17 +183,8 @@ public class BlueNMEA extends Activity
         if (newLocationProvider.equals(locationProvider))
             return;
 
-        if (connected)
-            locationManager.removeUpdates(this);
-
         locationProvider = newLocationProvider;
         source.setLocationProvider(newLocationProvider);
-
-        if (connected) {
-            providerStatus.setText("waiting");
-            locationManager.requestLocationUpdates(locationProvider,
-                                                   1000, 0, this);
-        }
     }
 
     /** from Source.NMEAListener */
@@ -224,35 +202,8 @@ public class BlueNMEA extends Activity
         }
     }
 
-    /** from LocationManager */
-    @Override public void onLocationChanged(Location newLocation) {
-        Log.d(TAG, "onLocationChanged " + newLocation);
-
-        providerStatus.setText("ok");
-    }
-
-    /** from LocationManager */
-    @Override public void onProviderDisabled(String provider) {
-        providerStatus.setText("disabled");
-    }
-
-    /** from LocationManager */
-    @Override public void onProviderEnabled(String provider) {
-        providerStatus.setText("enabled");
-    }
-
-    /** from LocationManager */
-    @Override public void onStatusChanged(String provider, int status,
-                                          Bundle extras) {
-        switch (status) {
-        case LocationProvider.OUT_OF_SERVICE:
-        case LocationProvider.TEMPORARILY_UNAVAILABLE:
-            providerStatus.setText("unavailable");
-            break;
-
-        case LocationProvider.AVAILABLE:
-            providerStatus.setText("ok");
-            break;
-        }
+    /** from Source.StatusListener */
+    @Override public void onStatusChanged(int status) {
+        providerStatus.setText(status);
     }
 }

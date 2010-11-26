@@ -61,17 +61,26 @@ public class Source
     /** the most recent known location, or null */
     Location location;
 
+    public interface StatusListener {
+        void onStatusChanged(int status);
+    }
+
     public interface NMEAListener {
         void onLine(String line);
     }
 
+    StatusListener statusListener;
     List<NMEAListener> nmeaListeners = new LinkedList<NMEAListener>();
 
-    Source(LocationManager _locationManager) {
+    Source(LocationManager _locationManager, StatusListener _statusListener) {
         locationManager = _locationManager;
+        statusListener = _statusListener;
     }
 
     protected void enable() {
+        if (statusListener != null)
+            statusListener.onStatusChanged(R.string.status_waiting);
+
         locationManager.requestLocationUpdates(locationProvider,
                                                1000, 0, this);
 
@@ -96,6 +105,9 @@ public class Source
 
         if (locationProvider.equals(LocationManager.GPS_PROVIDER))
             locationManager.removeGpsStatusListener(this);
+
+        if (statusListener != null)
+            statusListener.onStatusChanged(R.string.status_unknown);
     }
 
     public void setLocationProvider(String _locationProvider) {
@@ -165,6 +177,9 @@ public class Source
     @Override public void onLocationChanged(Location newLocation) {
         Log.d(TAG, "onLocationChanged " + newLocation);
 
+        if (statusListener != null)
+            statusListener.onStatusChanged(R.string.status_ok);
+
         if (location != null)
             /* reset the timer */
             timer.removeCallbacks(this);
@@ -185,11 +200,16 @@ public class Source
 
     /** from LocationManager */
     @Override public void onProviderDisabled(String provider) {
+        if (statusListener != null)
+            statusListener.onStatusChanged(R.string.status_disabled);
+
         clearLocation();
     }
 
     /** from LocationManager */
     @Override public void onProviderEnabled(String provider) {
+        if (statusListener != null)
+            statusListener.onStatusChanged(R.string.status_enabled);
     }
 
     /** from LocationManager */
@@ -198,10 +218,15 @@ public class Source
         switch (status) {
         case LocationProvider.OUT_OF_SERVICE:
         case LocationProvider.TEMPORARILY_UNAVAILABLE:
+            if (statusListener != null)
+                statusListener.onStatusChanged(R.string.status_unavailable);
+
             clearLocation();
             break;
 
         case LocationProvider.AVAILABLE:
+            if (statusListener != null)
+                statusListener.onStatusChanged(R.string.status_ok);
             break;
         }
     }

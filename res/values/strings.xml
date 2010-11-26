@@ -13,4 +13,11 @@
   <string name="no_devices">No Bluetooth devices were found.</string>
   <string name="bridge_failed">Failed to load the Bluetooth library.</string>
   <string name="no_bluetooth">Please enable Bluetooth.</string>
+
+  <string name="status_unknown">unknown</string>
+  <string name="status_waiting">waiting</string>
+  <string name="status_ok">ok</string>
+  <string name="status_disabled">disabled</string>
+  <string name="status_enabled">enabled</string>
+  <string name="status_unavailable">unavailable</string>
 </resources>
