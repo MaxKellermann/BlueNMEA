@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2009 Max Kellermann <max@duempel.org>
+ * Copyright (C) 2003-2010 Max Kellermann <max@duempel.org>
  * http://max.kellermann.name/projects/blue-nmea/
  *
  * This program is free software; you can redistribute it and/or modify
