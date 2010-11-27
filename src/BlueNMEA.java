@@ -23,15 +23,18 @@ import java.util.List;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.view.View;
-import android.os.Handler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
@@ -41,10 +44,43 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.util.Log;
 
+class ScanThread extends Thread {
+    public static final int SUCCESS = 1;
+    public static final int ERROR = 2;
+    public static final int EXCEPTION = 3;
+
+    Bridge bridge;
+    Handler handler;
+
+    public ScanThread(Bridge _bridge, Handler _handler) {
+        bridge = _bridge;
+        handler = _handler;
+    }
+
+    @Override public void run() {
+        Message msg;
+
+        try {
+            String[] devices;
+            devices = bridge.scan();
+
+            msg = handler.obtainMessage(SUCCESS, devices);
+        } catch (NoBluetoothException e) {
+            msg = handler.obtainMessage(ERROR, R.string.no_bluetooth, 0);
+        } catch (IOException e) {
+            msg = handler.obtainMessage(EXCEPTION, e);
+        }
+
+        handler.sendMessage(msg);
+    }
+}
+
 public class BlueNMEA extends Activity
     implements RadioGroup.OnCheckedChangeListener,
                Source.StatusListener, Client.Listener {
     private static final String TAG = "BlueNMEA";
+
+    static final int SCANNING_DIALOG = 0;
 
     Bridge bridge;
 
@@ -156,24 +192,7 @@ public class BlueNMEA extends Activity
         addClient(bluetoothClient);
     }
 
-    private void onConnectButtonClicked() {
-        String[] devices;
-
-        try {
-            devices = bridge.scan();
-        } catch (NoBluetoothException e) {
-            new AlertDialog.Builder(this)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.no_bluetooth)
-                .setPositiveButton("OK", null)
-                .show();
-            return;
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            ExceptionAlert(e, "Scan failed");
-            return;
-        }
-
+    protected void scanFinished(String[] devices) {
         ArrayList<String> deviceArray =
             new ArrayList<String>(devices.length);
         for (String device: devices)
@@ -187,6 +206,50 @@ public class BlueNMEA extends Activity
                                    SelectDevice.class);
         intent.putExtras(bundle);
         startActivityForResult(intent, 0);
+    }
+
+    class ScanHandler extends Handler {
+        public void handleMessage(Message msg) {
+            dismissDialog(SCANNING_DIALOG);
+
+            switch (msg.what) {
+            case ScanThread.SUCCESS:
+                scanFinished((String[])msg.obj);
+                break;
+
+            case ScanThread.ERROR:
+                new AlertDialog.Builder(BlueNMEA.this)
+                    .setTitle(R.string.app_name)
+                    .setMessage(msg.arg1)
+                    .setPositiveButton("OK", null)
+                    .show();
+                return;
+
+            case ScanThread.EXCEPTION:
+                ExceptionAlert((Throwable)msg.obj, "Scan failed");
+                break;
+            }
+        }
+    }
+
+    final Handler scanHandler = new ScanHandler();
+
+    /** from Activity */
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case SCANNING_DIALOG:
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage(getString(R.string.scanning));
+            return progressDialog;
+
+        default:
+            return null;
+        }
+    }
+
+    private void onConnectButtonClicked() {
+        showDialog(SCANNING_DIALOG);
+        new ScanThread(bridge, scanHandler).start();
     }
 
     /** from RadioGroup.OnCheckedChangeListener */
