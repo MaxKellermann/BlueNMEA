@@ -237,6 +237,29 @@ public class BlueNMEA extends Activity
 
     final Handler scanHandler = new ScanHandler();
 
+    class ClientHandler extends Handler {
+        public static final int REMOVE = 1;
+
+        public void handleMessage(Message msg) {
+            Client client = (Client)msg.obj;
+
+            switch (msg.what) {
+            case REMOVE:
+                removeClient(client);
+
+                if (client == bluetoothClient) {
+                    bluetoothClient = null;
+                    bluetoothStatus.setText("disconnected: " +
+                                            msg.getData().getString("error"));
+                }
+
+                break;
+            }
+        }
+    }
+
+    final Handler clientHandler = new ClientHandler();
+
     /** from Activity */
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -280,12 +303,13 @@ public class BlueNMEA extends Activity
 
     /** from Client.Listener */
     @Override public void onClientFailure(Client client, Throwable t) {
-        removeClient(client);
+        Message msg = clientHandler.obtainMessage(ClientHandler.REMOVE,
+                                                  client);
+        Bundle b = new Bundle();
+        b.putString("error", t.getMessage());
+        msg.setData(b);
 
-        if (client == bluetoothClient) {
-            bluetoothClient = null;
-            bluetoothStatus.setText("disconnected: " + t.getMessage());
-        }
+        clientHandler.sendMessage(msg);
 
         client.close();
     }
