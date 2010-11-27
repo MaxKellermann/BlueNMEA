@@ -64,7 +64,10 @@ class ScanThread extends Thread {
             String[] devices;
             devices = bridge.scan();
 
-            msg = handler.obtainMessage(SUCCESS, devices);
+            if (devices.length > 0)
+                msg = handler.obtainMessage(SUCCESS, devices);
+            else
+                msg = handler.obtainMessage(ERROR, R.string.no_devices, 0);
         } catch (NoBluetoothException e) {
             msg = handler.obtainMessage(ERROR, R.string.no_bluetooth, 0);
         } catch (IOException e) {
