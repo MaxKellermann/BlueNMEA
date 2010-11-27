@@ -28,6 +28,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
 import android.view.View;
 import android.os.Handler;
 import android.content.Context;
@@ -59,6 +61,9 @@ public class BlueNMEA extends Activity
     RadioGroup locationProviderGroup;
     TextView providerStatus, bluetoothStatus;
 
+    ArrayList<Client> clients = new ArrayList<Client>();
+    ArrayAdapter clientListAdapter;
+
     private void ExceptionAlert(Throwable exception, String title) {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle(title);
@@ -69,6 +74,18 @@ public class BlueNMEA extends Activity
                 }
             });
         dialog.show();
+    }
+
+    private void addClient(Client client) {
+        clients.add(client);
+        clientListAdapter.add(client.toString());
+        source.addListener(client);
+    }
+
+    private void removeClient(Client client) {
+        source.removeListener(client);
+        clients.remove(client);
+        clientListAdapter.remove(client.toString());
     }
 
     /** from Activity */
@@ -103,6 +120,11 @@ public class BlueNMEA extends Activity
         locationProvider = LocationManager.GPS_PROVIDER;
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         source = new Source(locationManager, this);
+
+        clientListAdapter =
+            new ArrayAdapter(this, android.R.layout.simple_list_item_1);
+        ListView clientList = (ListView)findViewById(R.id.clients);
+        clientList.setAdapter(clientListAdapter);
     }
 
     /** from Activity */
@@ -116,7 +138,8 @@ public class BlueNMEA extends Activity
             return;
 
         if (bluetoothClient != null) {
-            source.removeListener(bluetoothClient);
+            removeClient(bluetoothClient);
+
             bluetoothClient.close();
             bluetoothClient = null;
         }
@@ -130,7 +153,7 @@ public class BlueNMEA extends Activity
         }
 
         bluetoothClient = new Peer(this, bridge, address);
-        source.addListener(bluetoothClient);
+        addClient(bluetoothClient);
     }
 
     private void onConnectButtonClicked() {
@@ -191,12 +214,13 @@ public class BlueNMEA extends Activity
 
     /** from Client.Listener */
     @Override public void onClientFailure(Client client, Throwable t) {
+        removeClient(client);
+
         if (client == bluetoothClient) {
             bluetoothClient = null;
             bluetoothStatus.setText("disconnected: " + t.getMessage());
         }
 
-        source.removeListener(client);
         client.close();
     }
 }
