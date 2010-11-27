@@ -1,4 +1,4 @@
-BlueNMEA 2.0 - not yet released
+BlueNMEA 2.0 - 2010-11-27
 * Makefile: adapt to newest Android NDK r4b
 * Main: show progress dialog while scanning
 * listen on a TCP port (without Bluetooth)
