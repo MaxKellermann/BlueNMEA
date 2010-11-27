@@ -28,10 +28,16 @@ class Peer extends Client {
     boolean connected = false;
 
     Bridge bridge;
+    String address;
 
-    public Peer(Listener _listener, Bridge _bridge) {
+    public Peer(Listener _listener, Bridge _bridge, String _address) {
         super(_listener);
         bridge = _bridge;
+        address = _address;
+    }
+
+    public String toString() {
+        return address;
     }
 
     /** from Client */

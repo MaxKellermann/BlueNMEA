@@ -129,7 +129,7 @@ public class BlueNMEA extends Activity
             return;
         }
 
-        bluetoothClient = new Peer(this, bridge);
+        bluetoothClient = new Peer(this, bridge, address);
         source.addListener(bluetoothClient);
     }
 
