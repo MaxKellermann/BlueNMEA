@@ -18,29 +18,21 @@
 
 package name.kellermann.max.bluenmea;
 
-import java.util.LinkedList;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.ServerSocket;
 import android.util.Log;
 
-class TCPClient extends Client implements Source.NMEAListener, Runnable {
-    private static final String TAG = "BlueNMEA";
-
+class TCPClient extends ThreadedStreamClient {
     Socket socket;
     String address;
-    LinkedList<String> queue = new LinkedList<String>();
-    Thread thread = new Thread(this);
 
-    public TCPClient(Listener _listener, Socket _socket) {
-        super(_listener);
+    public TCPClient(Listener _listener, Socket _socket) throws IOException {
+        super(_listener, _socket.getOutputStream());
 
         socket = _socket;
         address = socket.getInetAddress().getHostAddress() +
             ":" + socket.getPort();
-
-        thread.start();
     }
 
     /** from Object */
@@ -50,63 +42,14 @@ class TCPClient extends Client implements Source.NMEAListener, Runnable {
 
     /** from Client */
     @Override public void close() {
-        synchronized(this) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-            }
-
-            socket = null;
-
-            notify();
-        }
+        super.close();
 
         try {
-            thread.join();
-        } catch (InterruptedException e) {
-        }
-    }
-
-    /** from Source.NMEAListener */
-    @Override public void onLine(String line) {
-        synchronized(this) {
-            /* ensure the queue doesn't grow too large */
-            while (queue.size() > 16)
-                queue.removeFirst();
-
-            queue.add(line);
-
-            /* wake up the thread */
-            notify();
-        }
-    }
-
-    public void run() {
-        try {
-            OutputStream os = socket.getOutputStream();
-
-            while (socket != null) {
-                String line;
-                synchronized(this) {
-                    wait();
-
-                    if (socket == null)
-                        break;
-
-                    line = queue.removeFirst();
-                }
-
-                if (line != null) {
-                    line += "\n";
-                    os.write(line.getBytes());
-                }
-            }
-        } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage());
+            socket.close();
         } catch (IOException e) {
-            if (socket != null)
-                failed(e);
         }
+
+        socket = null;
     }
 }
 
