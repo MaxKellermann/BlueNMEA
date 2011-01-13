@@ -81,7 +81,7 @@ class ScanThread extends Thread {
 public class BlueNMEA extends Activity
     implements RadioGroup.OnCheckedChangeListener,
                Source.StatusListener, Client.Listener,
-               TCPServer.Listener {
+               Server.Listener {
     private static final String TAG = "BlueNMEA";
 
     static final int SCANNING_DIALOG = 0;
@@ -91,7 +91,7 @@ public class BlueNMEA extends Activity
     /** the Bluetooth peer; null if none is connected */
     Client bluetoothClient;
 
-    TCPServer tcp;
+    Server tcp;
 
     /** the name of the currently selected location provider */
     String locationProvider;
@@ -331,7 +331,7 @@ public class BlueNMEA extends Activity
         client.close();
     }
 
-    /** from TCPServer.Listener */
+    /** from Server.Listener */
     @Override public void onNewClient(Client client) {
         Message msg = clientHandler.obtainMessage(ClientHandler.ADD,
                                                   client);

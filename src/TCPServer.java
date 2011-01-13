@@ -110,13 +110,9 @@ class TCPClient extends Client implements Source.NMEAListener, Runnable {
     }
 }
 
-public class TCPServer
+public class TCPServer extends Server
     implements Runnable {
     private static final String TAG = "BlueNMEA";
-
-    interface Listener extends Client.Listener {
-        void onNewClient(Client client);
-    }
 
     Listener listener;
     ServerSocket socket;
@@ -129,14 +125,14 @@ public class TCPServer
         thread.start();
     }
 
-    public void close() throws IOException, InterruptedException {
+    @Override public void close() throws IOException, InterruptedException {
         ServerSocket s = socket;
         socket = null;
         s.close();
         thread.join();
     }
 
-    public void run() {
+    @Override public void run() {
         try {
             while (true) {
                 Socket s = socket.accept();
