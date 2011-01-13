@@ -8,8 +8,8 @@ CLASS_SOURCE = $(subst .,/,$(CLASS_NAME)).java
 CLASS_CLASS = $(patsubst %.java,%.class,$(CLASS_SOURCE))
 CLASS_HEADER = $(subst .,_,$(CLASS_NAME)).h
 
-JAVA_SOURCES = $(wildcard src/$(subst .,/,$(JAVA_PACKAGE))/*.java)
-JAVA_CLASSES = $(patsubst src/%.java,bin/classes/%.class,$(JAVA_SOURCES))
+JAVA_SOURCES = $(wildcard src/*.java)
+JAVA_CLASSES = $(patsubst src/%.java,bin/classes/$(subst .,/,$(JAVA_PACKAGE))/%.class,$(JAVA_SOURCES))
 
 SDK_ROOT = $(HOME)/opt/android-sdk-linux_x86
 NDK_ROOT = $(HOME)/opt/android-ndk-1.5_r1
