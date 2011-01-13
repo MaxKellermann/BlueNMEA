@@ -16,7 +16,7 @@ NDK_ROOT = $(HOME)/opt/android-ndk-1.5_r1
 
 .PHONY: all clean realclean update install reinstall uninstall release
 
-all: bin/.$(PROJECT_NAME)-debug.apk
+all: bin/$(PROJECT_NAME)-debug.apk
 
 clean:
 	rm -rf bin gen libs
@@ -41,13 +41,13 @@ jni/$(CLASS_HEADER): bin/classes/$(CLASS_CLASS)
 libs/armeabi/lib$(JNI_NAME).so: jni/$(CLASS_HEADER) $(wildcard jni/*.c)
 	ndk-build
 
-bin/.$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml
+bin/$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml
 	ant -quiet debug
 
-install: bin/.$(PROJECT_NAME)-debug.apk
+install: bin/$(PROJECT_NAME)-debug.apk
 	$(SDK_ROOT)/tools/adb install $<
 
-reinstall: bin/.$(PROJECT_NAME)-debug.apk
+reinstall: bin/$(PROJECT_NAME)-debug.apk
 	$(SDK_ROOT)/tools/adb install -r $<
 
 uninstall:
