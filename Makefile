@@ -26,7 +26,7 @@ realclean: clean
 	rm -f build.xml default.properties local.properties
 
 build.xml: AndroidManifest.xml
-	$(SDK_ROOT)/tools/android update project --path `pwd` --target 2
+	$(SDK_ROOT)/tools/android update project --path `pwd` --target 5
 
 update:| realclean build.xml
 
