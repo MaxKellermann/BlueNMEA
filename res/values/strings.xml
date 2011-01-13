@@ -6,6 +6,7 @@
   <string name="network_provider">Network</string>
   <string name="provider_status_label">Provider status:</string>
   <string name="bluetooth_status_label">Bluetooth status:</string>
+  <string name="bluetooth_server_status_label">Bluetooth server status:</string>
   <string name="tcp_status_label">TCP status:</string>
   <string name="listen">Listen</string>
   <string name="accept">Accept</string>

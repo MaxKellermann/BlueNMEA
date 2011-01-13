@@ -91,7 +91,7 @@ public class BlueNMEA extends Activity
     /** the Bluetooth peer; null if none is connected */
     Client bluetoothClient;
 
-    Server tcp;
+    Server tcp, bluetoothServer;
 
     /** the name of the currently selected location provider */
     String locationProvider;
@@ -101,7 +101,7 @@ public class BlueNMEA extends Activity
     Source source;
 
     RadioGroup locationProviderGroup;
-    TextView providerStatus, bluetoothStatus, tcpStatus;
+    TextView providerStatus, bluetoothStatus, bluetoothServerStatus, tcpStatus;
 
     ArrayList<Client> clients = new ArrayList<Client>();
     ArrayAdapter clientListAdapter;
@@ -146,6 +146,8 @@ public class BlueNMEA extends Activity
         providerStatus.setText(R.string.status_unknown);
         bluetoothStatus = (TextView)findViewById(R.id.bluetoothStatus);
         bluetoothStatus.setText("not connected");
+        bluetoothServerStatus = (TextView)findViewById(R.id.bluetoothServerStatus);
+        bluetoothServerStatus.setText("not initialized");
         tcpStatus = (TextView)findViewById(R.id.tcpStatus);
 
         locationProviderGroup = (RadioGroup)findViewById(R.id.provider);
@@ -175,6 +177,15 @@ public class BlueNMEA extends Activity
             tcpStatus.setText("listening on port " + port);
         } catch (IOException e) {
             tcpStatus.setText("failed: " + e.getMessage());
+        }
+
+        try {
+            bluetoothServer = new ToothServer(this);
+            bluetoothServerStatus.setText("listening");
+        } catch (Exception e) {
+            bluetoothServerStatus.setText("failed: " + e.getMessage());
+        } catch (VerifyError e) {
+            bluetoothServerStatus.setText("not available");
         }
     }
 

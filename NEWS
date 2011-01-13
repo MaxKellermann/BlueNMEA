@@ -1,4 +1,5 @@
 BlueNMEA 2.1 - not yet released
+* provide a Bluetooth server (RFCOMM serial port)
 
 BlueNMEA 2.0 - 2010-11-27
 * Makefile: adapt to newest Android NDK r4b
