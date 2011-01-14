@@ -35,6 +35,9 @@ import android.widget.RadioGroup;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
@@ -187,6 +190,36 @@ public class BlueNMEA extends Activity
             bluetoothServerStatus.setText("failed: " + e.getMessage());
         } catch (VerifyError e) {
             bluetoothServerStatus.setText("not available");
+        }
+    }
+
+    /** from Activity */
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    /** from Activity */
+    @Override public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.disconnect_all).setEnabled(!clients.isEmpty());
+        return true;
+    }
+
+    /** from Activity */
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.disconnect_all:
+            ArrayList<Client> copy = new ArrayList<Client>(clients);
+            for (Client client : copy) {
+                removeClient(client);
+                client.close();
+            }
+
+            return true;
+
+        default:
+            return super.onOptionsItemSelected(item);
         }
     }
 
