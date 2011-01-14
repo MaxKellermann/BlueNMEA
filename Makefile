@@ -30,18 +30,18 @@ build.xml: AndroidManifest.xml
 
 update:| realclean build.xml
 
-bin/classes/$(CLASS_CLASS): $(JAVA_SOURCES) build.xml
+bin/stamp-compile: $(JAVA_SOURCES) build.xml
 	ant -quiet compile
+	@touch $@
 
-compile: bin/classes/$(CLASS_CLASS)
-
-jni/$(CLASS_HEADER): bin/classes/$(CLASS_CLASS)
+jni/$(CLASS_HEADER): bin/stamp-compile
+	@rm -f $@
 	javah -classpath bin/classes -d jni $(CLASS_NAME)
 
 libs/armeabi/lib$(JNI_NAME).so: jni/$(CLASS_HEADER) $(wildcard jni/*.c)
 	ndk-build
 
-bin/$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml
+bin/$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml $(JAVA_SOURCES)
 	ant -quiet debug
 
 install: bin/$(PROJECT_NAME)-debug.apk
