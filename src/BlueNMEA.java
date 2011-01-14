@@ -336,6 +336,9 @@ public class BlueNMEA extends Activity
                 break;
 
             case REMOVE:
+                if (!clients.contains(client))
+                    return;
+
                 removeClient(client);
 
                 if (client == bluetoothClient) {
