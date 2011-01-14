@@ -31,6 +31,11 @@ public class Bridge {
         }
     }
 
+    /**
+     * Are Bluetooth sockets supported?
+     */
+    public native boolean available();
+
     public native String[] scan() throws IOException;
     public native void open(String address) throws IOException;
     public native void listen() throws IOException;

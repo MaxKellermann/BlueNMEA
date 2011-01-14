@@ -166,7 +166,7 @@ public class BlueNMEA extends Activity
         clientList.setAdapter(clientListAdapter);
 
         bridge = new Bridge();
-        if (!bridge.loaded) {
+        if (!bridge.loaded || !bridge.available()) {
             bridge = null;
             bluetoothStatus.setText("not available");
             button.setVisibility(View.GONE);

@@ -111,6 +111,15 @@ jstring_to_sockaddr_rc(struct sockaddr_rc *dest, JNIEnv *env, jstring src)
 	return ret == 0;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_name_kellermann_max_bluenmea_Bridge_available(JNIEnv *env, jobject obj)
+{
+	(void)env;
+	(void)obj;
+
+	return hci_get_route(NULL) >= 0;
+}
+
 JNIEXPORT jobjectArray JNICALL
 Java_name_kellermann_max_bluenmea_Bridge_scan(JNIEnv *env, jobject obj)
 {
