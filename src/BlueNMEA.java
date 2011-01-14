@@ -101,7 +101,7 @@ public class BlueNMEA extends Activity
     Source source;
 
     RadioGroup locationProviderGroup;
-    TextView providerStatus, bluetoothStatus, bluetoothServerStatus, tcpStatus;
+    TextView providerStatus, bluetoothClientStatus, bluetoothServerStatus, tcpStatus;
 
     ArrayList<Client> clients = new ArrayList<Client>();
     ArrayAdapter clientListAdapter;
@@ -138,8 +138,8 @@ public class BlueNMEA extends Activity
 
         providerStatus = (TextView)findViewById(R.id.providerStatus);
         providerStatus.setText(R.string.status_unknown);
-        bluetoothStatus = (TextView)findViewById(R.id.bluetoothStatus);
-        bluetoothStatus.setText("not connected");
+        bluetoothClientStatus = (TextView)findViewById(R.id.bluetoothClientStatus);
+        bluetoothClientStatus.setText("not connected");
         bluetoothServerStatus = (TextView)findViewById(R.id.bluetoothServerStatus);
         bluetoothServerStatus.setText("not initialized");
         tcpStatus = (TextView)findViewById(R.id.tcpStatus);
@@ -168,7 +168,7 @@ public class BlueNMEA extends Activity
         bridge = new Bridge();
         if (!bridge.loaded || !bridge.available()) {
             bridge = null;
-            bluetoothStatus.setText("not available");
+            bluetoothClientStatus.setText("not available");
             button.setVisibility(View.GONE);
         }
 
@@ -209,9 +209,9 @@ public class BlueNMEA extends Activity
 
         try {
             bridge.open(address);
-            bluetoothStatus.setText("connected with " + address);
+            bluetoothClientStatus.setText("connected with " + address);
         } catch (IOException e) {
-            bluetoothStatus.setText("failed: " + e.getMessage());
+            bluetoothClientStatus.setText("failed: " + e.getMessage());
             return;
         }
 
@@ -278,8 +278,8 @@ public class BlueNMEA extends Activity
 
                 if (client == bluetoothClient) {
                     bluetoothClient = null;
-                    bluetoothStatus.setText("disconnected: " +
-                                            msg.getData().getString("error"));
+                    bluetoothClientStatus.setText("disconnected: " +
+                                                  msg.getData().getString("error"));
                 }
 
                 break;
