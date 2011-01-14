@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -167,6 +168,34 @@ public class BlueNMEA extends Activity
             new ArrayAdapter(this, android.R.layout.simple_list_item_1);
         ListView clientList = (ListView)findViewById(R.id.clients);
         clientList.setAdapter(clientListAdapter);
+
+        clientList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override public void onItemClick(AdapterView<?> parent,
+                                                  View view, int position,
+                                                  long id) {
+                    final Client client = clients.get(position);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(BlueNMEA.this);
+                    builder.setMessage("Do you want to disconnect the client " + client + "?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    if (!clients.contains(client))
+                                        return;
+
+                                    removeClient(client);
+                                    client.close();
+                                }
+                            })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                }
+                            });
+                    builder.create().show();
+                }
+            });
 
         bridge = new Bridge();
         if (!bridge.loaded || !bridge.available()) {
