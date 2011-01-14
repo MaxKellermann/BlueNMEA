@@ -134,12 +134,6 @@ public class BlueNMEA extends Activity
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        bridge = new Bridge();
-        if (!bridge.loaded) {
-            setContentView(R.layout.bridge_failed);
-            return;
-        }
-
         setContentView(R.layout.main);
 
         providerStatus = (TextView)findViewById(R.id.providerStatus);
@@ -170,6 +164,13 @@ public class BlueNMEA extends Activity
             new ArrayAdapter(this, android.R.layout.simple_list_item_1);
         ListView clientList = (ListView)findViewById(R.id.clients);
         clientList.setAdapter(clientListAdapter);
+
+        bridge = new Bridge();
+        if (!bridge.loaded) {
+            bridge = null;
+            bluetoothStatus.setText("not available");
+            button.setVisibility(View.GONE);
+        }
 
         try {
             int port = 4352;
