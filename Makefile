@@ -45,13 +45,13 @@ bin/$(PROJECT_NAME)-debug.apk: libs/armeabi/lib$(JNI_NAME).so build.xml $(JAVA_S
 	ant -quiet debug
 
 install: bin/$(PROJECT_NAME)-debug.apk
-	$(SDK_ROOT)/tools/adb install $<
+	$(SDK_ROOT)/platform-tools/adb install $<
 
 reinstall: bin/$(PROJECT_NAME)-debug.apk
-	$(SDK_ROOT)/tools/adb install -r $<
+	$(SDK_ROOT)/platform-tools/adb install -r $<
 
 uninstall:
-	$(SDK_ROOT)/tools/adb uninstall $(JAVA_PACKAGE)
+	$(SDK_ROOT)/platform-tools/adb uninstall $(JAVA_PACKAGE)
 
 release: libs/armeabi/lib$(JNI_NAME).so build.xml
 	ant -quiet release
