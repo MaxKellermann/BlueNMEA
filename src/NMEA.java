@@ -173,7 +173,7 @@ final class NMEA {
     public static String formatBearing(Location location) {
         String s = "";
         if (location.hasBearing())
-            s += location.hasBearing();
+            s += location.getBearing();
         return s;
     }
 

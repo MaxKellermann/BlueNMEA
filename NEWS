@@ -1,4 +1,5 @@
 BlueNMEA 2.1.1 - not yet released
+* fix the "bearing" GPRMC column
 
 BlueNMEA 2.1 - 2011-01-14
 * provide a Bluetooth server (RFCOMM serial port)
