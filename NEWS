@@ -1,3 +1,5 @@
+BlueNMEA 2.1.1 - not yet released
+
 BlueNMEA 2.1 - 2011-01-14
 * provide a Bluetooth server (RFCOMM serial port)
 * allow operation without native library
