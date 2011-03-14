@@ -4,7 +4,7 @@ BlueNMEA for Android
  http://max.kellermann.name/projects/blue-nmea/
 
 BlueNMEA is an Android application which sends location data over
-Bluetooth (RFCOMM) in the NMEA format.
+Bluetooth (RFCOMM) or TCP in the NMEA format.
 
 I wrote this program to feed my PDA running XCSoar
 (http://www.xcsoar.org/).
@@ -42,21 +42,47 @@ in the according branch.  Run "ndk-build", then copy the headers
 ./obj/local/armeabi/libbluetooth.a to $LIBBLUETOOTH_BASE/libs/armeabi.
 
 
-Using BlueNMEA over Bluetooth
------------------------------
+BlueNMEA as a RFCOMM server
+---------------------------
 
-Right now, BlueNMEA can not listen for incoming RFCOMM connections.
-It attempts to initiate the connection.
+This mode is only available on Android 2.x.
+
+BlueNMEA acts as a server, and provides a serial port other devices
+can connect to.
+
+Instructions:
+
+Launch BlueNMEA.  Pair your Android handset with the other device
+(using the Android settings menu).
+
+As long as BlueNMEA runs, paired devices will see that your Android
+handset offers a serial port, which they may now connect to.
+Concurrent connections from multiple devices are possible.
+
+
+BlueNMEA as a RFCOMM client
+---------------------------
+
+This mode was a hack to make BlueNMEA work on Android 1.5 and 1.6.  It
+is deprecated, but may still be useful if your Android handset is not
+upgraded yet.  It may or may not be available on newer handsets.
 
 Make the remote device listen for RFCOMM.  On Windows Mobile, create
 an incoming COM port, and make the Bluetooth adapter visible.
 
 In BlueNMEA, select the GPS source, and click on "connect".  It
-attempts to discover nearby Bluetooth devices (no pairing required
-currently).  Click on the desired remote device.
+attempts to discover nearby Bluetooth devices (no pairing required).
+Click on the desired remote device.
 
 Once connected and location information is available, BlueNMEA starts
 sending NMEA records.
+
+
+Using BlueNMEA over TCP
+-----------------------
+
+If your Android handset is connected to a WiFi network, any host on
+the network can connect to its IP address on TCP port 4352.
 
 
 Using BlueNMEA over USB
