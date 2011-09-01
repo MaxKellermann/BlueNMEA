@@ -1,6 +1,7 @@
 BlueNMEA 2.1.3 - not yet released
 * catch IllegalArgumentException while setting up the LocationListener
 * Peer: work around NullPointerException
+* work around IllegalArgumentException from dismissDialog()
 
 BlueNMEA 2.1.2 - 2011-03-14
 * don't restart on screen orientation changes

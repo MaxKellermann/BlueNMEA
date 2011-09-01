@@ -299,7 +299,13 @@ public class BlueNMEA extends Activity
 
     class ScanHandler extends Handler {
         public void handleMessage(Message msg) {
-            dismissDialog(SCANNING_DIALOG);
+            try {
+                dismissDialog(SCANNING_DIALOG);
+            } catch (IllegalArgumentException e) {
+                /* this exception was reported on the Android Market,
+                   however I cannot imagine how this could ever
+                   happen */
+            }
 
             switch (msg.what) {
             case ScanThread.SUCCESS:
