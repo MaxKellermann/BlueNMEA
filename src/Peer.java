@@ -44,7 +44,9 @@ class Peer extends Client {
     @Override public void close() {
         Bridge b = bridge;
         bridge = null;
-        b.close();
+
+        if (b != null)
+            b.close();
     }
 
     /** from Source.NMEAListener */
