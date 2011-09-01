@@ -81,8 +81,16 @@ public class Source
         if (statusListener != null)
             statusListener.onStatusChanged(R.string.status_waiting);
 
-        locationManager.requestLocationUpdates(locationProvider,
-                                               1000, 0, this);
+        try {
+            locationManager.requestLocationUpdates(locationProvider,
+                                                   1000, 0, this);
+        } catch (IllegalArgumentException e) {
+            /* this exception was reported on the Android Market;
+               according to LocationManager's API documentation, it
+               shouldn't happen here */
+            statusListener.onStatusChanged(R.string.status_error);
+            return;
+        }
 
         if (locationProvider.equals(LocationManager.GPS_PROVIDER))
             locationManager.addGpsStatusListener(this);
